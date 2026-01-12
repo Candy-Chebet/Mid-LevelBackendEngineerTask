@@ -1,8 +1,20 @@
+// tests/unit/services/authService.test.js
 const authService = require('../../../src/services/authService');
 const userRepository = require('../../../src/repositories/userRepository');
+const bcrypt = require('bcrypt');
+const { generateToken } = require('../../../src/utils/jwt');
 const { ConflictError, UnauthorizedError } = require('../../../src/utils/errors');
 
-describe('AuthService', () => {
+// Mock dependencies ⬇️
+jest.mock('../../../src/repositories/userRepository');
+jest.mock('bcrypt');
+jest.mock('../../../src/utils/jwt');
+
+describe('AuthService Unit Tests', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe('register', () => {
     it('should successfully register a new user', async () => {
       const userData = {
@@ -10,90 +22,139 @@ describe('AuthService', () => {
         password: 'password123',
       };
 
-      const result = await authService.register(userData);
-
-      expect(result).toHaveProperty('user');
-      expect(result).toHaveProperty('token');
-      expect(result.user.email).toBe(userData.email);
-      expect(result.user.role).toBe('customer');
-      expect(result.user).not.toHaveProperty('passwordHash');
-    });
-
-    it('should register admin user when role is specified', async () => {
-      const userData = {
-        email: 'admin@example.com',
-        password: 'password123',
-        role: 'admin',
+      const mockUser = {
+        _id: 'user-123',
+        email: 'test@example.com',
+        role: 'customer',
+        createdAt: new Date(),
       };
 
+      // Setup mocks
+      userRepository.emailExists.mockResolvedValue(false);
+      bcrypt.hash.mockResolvedValue('hashed_password');
+      userRepository.create.mockResolvedValue(mockUser);
+      generateToken.mockReturnValue('mock_token');
+
       const result = await authService.register(userData);
 
-      expect(result.user.role).toBe('admin');
+      // Verify mocks were called correctly
+      expect(userRepository.emailExists).toHaveBeenCalledWith('test@example.com');
+      expect(bcrypt.hash).toHaveBeenCalledWith('password123', expect.any(Number));
+      expect(userRepository.create).toHaveBeenCalledWith({
+        email: 'test@example.com',
+        passwordHash: 'hashed_password',
+        role: 'customer',
+      });
+
+      // Verify result
+      expect(result).toEqual({
+        user: {
+          id: 'user-123',
+          email: 'test@example.com',
+          role: 'customer',
+          createdAt: mockUser.createdAt,
+        },
+        token: 'mock_token',
+      });
     });
 
     it('should throw ConflictError for duplicate email', async () => {
-      const userData = {
-        email: 'duplicate@example.com',
-        password: 'password123',
-      };
+      userRepository.emailExists.mockResolvedValue(true);
 
-      await authService.register(userData);
+      await expect(
+        authService.register({
+          email: 'duplicate@example.com',
+          password: 'password123',
+        })
+      ).rejects.toThrow(ConflictError);
 
-      await expect(authService.register(userData)).rejects.toThrow(ConflictError);
+      // Should not call create if email exists
+      expect(userRepository.create).not.toHaveBeenCalled();
     });
 
-    it('should hash the password', async () => {
-      const userData = {
-        email: 'test2@example.com',
-        password: 'password123',
+    it('should register admin user when role is specified', async () => {
+      const mockUser = {
+        _id: 'admin-123',
+        email: 'admin@example.com',
+        role: 'admin',
+        createdAt: new Date(),
       };
 
-      await authService.register(userData);
+      userRepository.emailExists.mockResolvedValue(false);
+      bcrypt.hash.mockResolvedValue('hashed_password');
+      userRepository.create.mockResolvedValue(mockUser);
+      generateToken.mockReturnValue('admin_token');
 
-      const user = await userRepository.findByEmail(userData.email);
-      expect(user.passwordHash).not.toBe(userData.password);
-      expect(user.passwordHash).toHaveLength(60);
+      const result = await authService.register({
+        email: 'admin@example.com',
+        password: 'password123',
+        role: 'admin',
+      });
+
+      expect(result.user.role).toBe('admin');
+      expect(userRepository.create).toHaveBeenCalledWith({
+        email: 'admin@example.com',
+        passwordHash: 'hashed_password',
+        role: 'admin',
+      });
     });
   });
 
   describe('login', () => {
     it('should successfully login with correct credentials', async () => {
-      const userData = {
+      const mockUser = {
+        _id: 'user-123',
         email: 'login@example.com',
-        password: 'password123',
+        passwordHash: 'hashed_password',
+        role: 'customer',
+        createdAt: new Date(),
       };
 
-      await authService.register(userData);
-      const result = await authService.login(userData);
+      userRepository.findByEmail.mockResolvedValue(mockUser);
+      bcrypt.compare.mockResolvedValue(true);
+      generateToken.mockReturnValue('login_token');
 
-      expect(result).toHaveProperty('user');
-      expect(result).toHaveProperty('token');
-      expect(result.user.email).toBe(userData.email);
+      const result = await authService.login({
+        email: 'login@example.com',
+        password: 'password123',
+      });
+
+      expect(userRepository.findByEmail).toHaveBeenCalledWith('login@example.com');
+      expect(bcrypt.compare).toHaveBeenCalledWith('password123', 'hashed_password');
+      expect(result.token).toBe('login_token');
     });
 
     it('should throw UnauthorizedError for non-existent user', async () => {
-      const credentials = {
-        email: 'nonexistent@example.com',
-        password: 'password123',
-      };
+      userRepository.findByEmail.mockResolvedValue(null);
 
-      await expect(authService.login(credentials)).rejects.toThrow(UnauthorizedError);
+      await expect(
+        authService.login({
+          email: 'nonexistent@example.com',
+          password: 'password123',
+        })
+      ).rejects.toThrow(UnauthorizedError);
+
+      expect(bcrypt.compare).not.toHaveBeenCalled();
     });
 
     it('should throw UnauthorizedError for incorrect password', async () => {
-      const userData = {
-        email: 'wrongpass@example.com',
-        password: 'password123',
+      const mockUser = {
+        _id: 'user-123',
+        email: 'test@example.com',
+        passwordHash: 'hashed_password',
       };
 
-      await authService.register(userData);
+      userRepository.findByEmail.mockResolvedValue(mockUser);
+      bcrypt.compare.mockResolvedValue(false);
 
-      const wrongCredentials = {
-        email: userData.email,
-        password: 'wrongpassword',
-      };
+      await expect(
+        authService.login({
+          email: 'test@example.com',
+          password: 'wrongpassword',
+        })
+      ).rejects.toThrow(UnauthorizedError);
 
-      await expect(authService.login(wrongCredentials)).rejects.toThrow(UnauthorizedError);
+      expect(generateToken).not.toHaveBeenCalled();
     });
   });
 });

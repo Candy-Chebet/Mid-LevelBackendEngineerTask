@@ -7,6 +7,7 @@
 https://mid-levelbackendengineertask.onrender.com
 
 ```
+- may be a little slow because it's a free version
 
 A production-ready RESTful API for managing orders, products, and users with authentication, built with Node.js, Express, and MongoDB.
 
