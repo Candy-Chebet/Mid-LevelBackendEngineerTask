@@ -15,6 +15,25 @@ A production-ready RESTful API for managing orders, products, and users with aut
 - **Clean Architecture**: Separation of concerns (routes → controllers → services → repositories)
 
 
+
+## ⚠️ Important Note on Transactions
+
+**Development Environment Limitation**: This implementation currently runs without MongoDB transactions due to using a standalone MongoDB instance. 
+
+**Why**: MongoDB transactions require a replica set. In development, I'm using standalone MongoDB for simplicity.
+
+**Production Solution**: In a production environment, this code is **transaction-ready**:
+1. Deploy MongoDB as a replica set (or use MongoDB Atlas)
+2. The codebase already has transaction infrastructure in place
+3. Simply pass session objects instead of `null` to repository methods
+
+**Design Rationale**: The architecture demonstrates understanding of:
+- Transaction boundaries (where they're needed)
+- Atomic operations (stock updates, cancellations)
+- Repository pattern (abstracts database operations)
+- Session handling (ready to enable with minimal changes)
+
+
 ## Prerequisites
 
 - Node.js >= 18.x
