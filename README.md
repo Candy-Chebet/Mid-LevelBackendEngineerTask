@@ -1,7 +1,7 @@
 # Order Service API
 
 
-## HOSTED VERSION FOR DIRECT USE : 
+## BASE URL for hosted version: 
 ```bash
 
 https://mid-levelbackendengineertask.onrender.com
