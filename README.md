@@ -1,5 +1,13 @@
 # Order Service API
 
+
+## HOSTED VERSION FOR DIRECT USE : 
+```bash
+
+https://mid-levelbackendengineertask.onrender.com
+
+```
+
 A production-ready RESTful API for managing orders, products, and users with authentication, built with Node.js, Express, and MongoDB.
 
 ## Features
