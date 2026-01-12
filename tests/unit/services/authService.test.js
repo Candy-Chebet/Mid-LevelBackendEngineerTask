@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const { generateToken } = require('../../../src/utils/jwt');
 const { ConflictError, UnauthorizedError } = require('../../../src/utils/errors');
 
-// Mock dependencies ⬇️
+// Mock dependencies
 jest.mock('../../../src/repositories/userRepository');
 jest.mock('bcrypt');
 jest.mock('../../../src/utils/jwt');
