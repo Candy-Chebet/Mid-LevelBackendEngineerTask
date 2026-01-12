@@ -12,7 +12,6 @@ A production-ready RESTful API for managing orders, products, and users with aut
 - **Rate Limiting**: Protection against brute force attacks
 - **Logging**: Structured logging with Winston
 - **Testing**: Unit and integration tests with Jest
-- **Docker Support**: Full containerization with docker-compose
 - **Clean Architecture**: Separation of concerns (routes → controllers → services → repositories)
 
 
@@ -21,7 +20,6 @@ A production-ready RESTful API for managing orders, products, and users with aut
 - Node.js >= 18.x
 - MongoDB >= 6.x
 - npm or yarn
-- Docker and Docker Compose (optional)
 
 ## Installation
 
