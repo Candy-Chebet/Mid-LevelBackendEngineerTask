@@ -28,7 +28,7 @@ A production-ready RESTful API for managing orders, products, and users with aut
 
 ## API Screenshots
 
-## Health CXheck
+## Health Check
 ![Health Check](./images/Health_check.png)
 
 ### Authentication Flow
