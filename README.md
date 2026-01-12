@@ -24,6 +24,59 @@ A production-ready RESTful API for managing orders, products, and users with aut
 
 
 
+---
+
+## API Screenshots
+
+## Health CXheck
+![Health Check](./images/Health_check.png)
+
+### Authentication Flow
+
+#### Register Admin
+![Register Admin](./images/register_admin.png)
+
+#### Register Customer
+![Register Customer](./images/Register_customer.png)
+
+#### Login
+![Login Success](./images/login_works_.png)
+
+#### Login with Hosted API
+![Login with Hosted](./images/example_login_with_hosted.png)
+
+---
+
+### Product Management
+
+#### Get All Products
+![Get Products](./images/GET_Product.png)
+
+#### Create Product (Admin Only)
+![Create Product](./images/Create_product.png)
+
+#### Update Product - Before
+![PATCH Product Before](./images/PATCH_Product_before.png)
+
+#### Update Product - After
+![PATCH Product After](./images/PATCH_Product_after.png)
+
+---
+
+### Order Management
+
+#### Customer Create Order
+![Customer Make Order](./images/Customer_make_order.png)
+
+#### Pay for Order
+![Pay for Order](./images/pay_for_order.png)
+
+#### Cancel Order
+![Cancel Order](./images/cancel_order.png)
+
+---
+
+
 ## ⚠️ Important Note on Transactions
 
 **Development Environment Limitation**: This implementation currently runs without MongoDB transactions due to using a standalone MongoDB instance. 
