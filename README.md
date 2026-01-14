@@ -167,19 +167,8 @@ A production-ready RESTful API for managing orders, products, and users with aut
 
 **Development Environment Limitation**: If you choose to go with non-docker or productions implementations, the local development implementation currently runs without MongoDB transactions due to using a standalone MongoDB instance. 
 
-**Why**: MongoDB transactions require a replica set. In development, I'm using standalone MongoDB for simplicity.
 
 **Production Solution**: In a production environment, this code is **transaction-ready**:
-1. Deploy MongoDB as a replica set (or use MongoDB Atlas)
-2. The codebase already has transaction infrastructure in place
-3. Simply pass session objects instead of `null` to repository methods
-
-**Design Rationale**: The architecture demonstrates understanding of:
-- Transaction boundaries (where they're needed)
-- Atomic operations (stock updates, cancellations)
-- Repository pattern (abstracts database operations)
-- Session handling (ready to enable with minimal changes)
-
 
 ## Prerequisites
 
@@ -648,13 +637,6 @@ npm test -- --coverage
   - `tests/integration/api/auth.test.js`
   - `tests/integration/api/products.test.js`
 
-## Design Decisions
-
-### 1. Transaction Safety
-
-**Decision**: Use MongoDB transactions for all stock-modifying operations (create order, cancel order).
-
-**Rationale**: Ensures data consistency. If any part of the order creation fails (e.g., insufficient stock for the 2nd item), the entire operation rolls back, including stock decrements for the 1st item.
 
 **Implementation**:
 ```javascript
@@ -668,59 +650,6 @@ try {
   throw error;
 }
 ```
-
-### 2. Payment Endpoint
-
-**Decision**: Paying an already-paid order returns 200 with current state.
-
-**Rationale**: Prevents double-charging in case of network retries or UI double-clicks.
-
-### 3. Cancelling Paid Orders
-
-**Decision**: Allow cancellation of paid orders (returns 200).
-
-**Rationale**: Real-world e-commerce systems allow refunds.
-
-### 4. Price Snapshot at Order Time
-
-**Decision**: Store `unitPrice` in order items rather than referencing product price.
-
-**Rationale**: Historical accuracy. Product prices may change, but orders should reflect the price at the time of purchase.
-
-### 5. UUID vs MongoDB ObjectId
-
-**Decision**: Use UUIDs for all entities.
-
-**Rationale**: 
-- More portable (not tied to MongoDB)
-- Harder to guess/enumerate
-- Better for distributed systems
-- Meets specification requirement
-
-### 6. Role-Based Access Control
-
-**Decision**: Enforce at the route level using middleware.
-
-**Rationale**: Clear separation of concerns. Authentication middleware verifies token, role middleware checks permissions.
-
-### 7. Centralized Error Handling
-
-**Decision**: Custom error classes extending AppError with consistent status codes.
-
-**Rationale**:
-- Single source of truth for error responses
-- Consistent API error format
-- Easier to maintain and test
-
-### 8. Repository Pattern
-
-**Decision**: Separate data access into repository layer.
-
-**Rationale**:
-- Easy to mock for testing
-- Database operations isolated from business logic
-- Could swap MongoDB for another database with minimal changes
-
 ## Project Structure
 
 ```
@@ -779,8 +708,9 @@ src/
     package.json
     README.md
 
-
+```
 ## Security Features
+```
 
 - **Password Hashing**: bcrypt with configurable rounds
 - **JWT Authentication**: Secure token-based auth
@@ -788,13 +718,14 @@ src/
 - **Input Validation**: Zod schemas prevent injection attacks
 - **CORS**: Configured for security
 
-
+```
 ## Author
-
+```
 Chebet Candy
 
+```
 ## Acknowledgments
-
+```
 Built with Node.js, Express, MongoDB, and love.
 
 ```
