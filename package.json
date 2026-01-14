@@ -8,7 +8,13 @@
     "test": "jest --coverage --detectOpenHandles",
     "test:watch": "jest --watch",
     "test:integration": "jest --testPathPattern=integration",
-    "seed": "node src/scripts/seed.js"
+    "seed": "node src/scripts/seed.js",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f app",
+    "docker:seed": "docker-compose exec app npm run seed",
+    "docker:test": "docker-compose exec app npm test"
   },
   "keywords": [],
   "author": "",

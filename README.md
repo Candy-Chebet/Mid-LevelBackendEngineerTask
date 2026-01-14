@@ -1,5 +1,90 @@
 # Order Service API
 
+## 🐳 Running with Docker
+
+### Prerequisites
+- Docker Desktop installed ([Download here](https://www.docker.com/products/docker-desktop))
+- Docker Compose (included with Docker Desktop)
+
+### Quick Start with Docker
+
+1. **Start MongoDB with Docker**
+```bash
+   docker-compose up -d
+```
+
+2. **Verify MongoDB is running**
+```bash
+   docker ps
+```
+   
+   You should see:
+```
+   CONTAINER ID   IMAGE       PORTS                      NAMES
+   abc123...      mongo:7.0   0.0.0.0:27017->27017/tcp   order_service_db
+```
+
+3. **Install dependencies and seed database**
+```bash
+   npm install
+   npm run seed
+```
+
+4. **Start the application**
+```bash
+   npm run dev
+```
+
+5. **Access the API**
+```
+   http://localhost:3000
+```
+
+### Docker Commands Reference
+```bash
+# Start services
+docker-compose up -d
+
+# Stop services (keeps data)
+docker-compose stop
+
+# Stop and remove containers (keeps data in volumes)
+docker-compose down
+
+# Stop and remove everything including data
+docker-compose down -v
+
+# View logs
+docker-compose logs -f
+
+# Check service status
+docker-compose ps
+
+# Restart services
+docker-compose restart
+```
+
+### Troubleshooting Docker
+
+**Port already in use:**
+```bash
+# Stop existing MongoDB
+docker stop order_service_db
+# Or if running locally:
+# macOS: brew services stop mongodb-community
+# Windows: net stop MongoDB
+```
+
+**Container won't start:**
+```bash
+# Check logs
+docker-compose logs mongodb
+
+# Restart from scratch
+docker-compose down -v
+docker-compose up -d
+```
+
 
 ## BASE URL for hosted version: 
 ```bash
@@ -80,7 +165,7 @@ A production-ready RESTful API for managing orders, products, and users with aut
 
 ## ⚠️ Important Note on Transactions
 
-**Development Environment Limitation**: This implementation currently runs without MongoDB transactions due to using a standalone MongoDB instance. 
+**Development Environment Limitation**: If you choose to go with non-docker or productions implementations, the local development implementation currently runs without MongoDB transactions due to using a standalone MongoDB instance. 
 
 **Why**: MongoDB transactions require a replica set. In development, I'm using standalone MongoDB for simplicity.
 

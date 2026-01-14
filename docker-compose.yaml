@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: order_service_db
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: order_service
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - order_service_network
+
+  app:
+    build: .
+    container_name: order_service_app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongodb:27017/order_service
+      - JWT_SECRET=your_super_secret_jwt_key_change_this
+      - JWT_EXPIRES_IN=7d
+    depends_on:
+      - mongodb
+    networks:
+      - order_service_network
+    volumes:
+      - ./src:/app/src
+    command: npm start
+
+volumes:
+  mongodb_data:
+
+networks:
+  order_service_network:
+    driver: bridge
