@@ -42,7 +42,7 @@
 
 **SWAGGER**
 ```
-api-docs/
+/api-docs
 ```
 
 ### Docker Commands Reference
