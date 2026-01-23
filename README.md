@@ -40,6 +40,11 @@
    http://localhost:3000
 ```
 
+**SWAGGER**
+```
+api-docs/
+```
+
 ### Docker Commands Reference
 ```bash
 # Start services

@@ -8,7 +8,6 @@ const validate = (schema) => {
       next();
     } catch (error) {
       if (error.name === 'ZodError') {
-        // ✅ FIX: Handle Zod errors properly
         const message = error.errors
           ? error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
           : error.message;
